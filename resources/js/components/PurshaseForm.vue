@@ -4,8 +4,9 @@
             <v-row>
                 <v-col cols="12" md="6">
                     <v-select
+                        v-if="localStores.length"
                         v-model.number="form.store_id"
-                        :items="stores"
+                        :items="localStores"
                         item-title="name"
                         item-value="id"
                         label="Магазин"
@@ -34,8 +35,9 @@
 
                 <v-col cols="12" md="6">
                     <v-select
+                        v-if="localCurrencies.length"
                         v-model="form.currency"
-                        :items="currencies"
+                        :items="localCurrencies"
                         label="Валюта"
                         required
                         density="compact"
@@ -93,6 +95,8 @@ export default {
     },
     data() {
         return {
+            localStores: this.stores ? [...this.stores] : [],
+            localCurrencies: this.currencies ? [...this.currencies] : [],
             form: {
                 store_id: this.purshase?.store_id || "",
                 purshase_date: this.purshase?.purshase_date || "",
@@ -121,24 +125,23 @@ export default {
             axios
                 .get("/api/stores")
                 .then((response) => {
-                    this.stores = response.data.data;
+                    this.localStores = response.data.data;
                 })
                 .catch((error) => {
                     console.error(
                         "Ошибка при получении списка магазинов:",
                         error
                     );
-                    // Обработка ошибки
                 });
         },
         fetchCurrencies() {
             axios
                 .get("/api/currencies")
                 .then((response) => {
-                    this.currencies = response.data.data;
+                    this.localCurrencies = response.data.data;
                 })
                 .catch((error) => {
-                    console.error("Ошибка при получении списка валют:", error);
+                    console.error("Ошибка при получении списка валют", error);
                 });
         },
         handleFileChange(event) {
@@ -171,11 +174,10 @@ export default {
                 })
                 .then((response) => {
                     this.$emit("create", response.data.data);
-                    this.$emit("close"); // Закрываем диалог после создания
+                    this.$emit("close");
                 })
                 .catch((error) => {
                     console.error("Ошибка при создании покупки:", error);
-                    // Обработка ошибки
                 })
                 .finally(() => {
                     this.loading = false;
@@ -190,11 +192,10 @@ export default {
                 })
                 .then((response) => {
                     this.$emit("update", response.data.data);
-                    this.$emit("close"); // Закрываем диалог после обновления
+                    this.$emit("close");
                 })
                 .catch((error) => {
                     console.error("Ошибка при обновлении покупки:", error);
-                    // Обработка ошибки
                 })
                 .finally(() => {
                     this.loading = false;

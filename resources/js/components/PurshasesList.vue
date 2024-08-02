@@ -14,7 +14,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row style="display: flex; align-items: center">
+                <v-row>
                     <v-col cols="12" md="6">
                         <v-select
                             v-model="selectedStore"
@@ -63,7 +63,12 @@
                     <span class="text-h5">Создать покупку</span>
                 </v-card-title>
                 <v-card-text>
-                    <PurshaseForm @create="onCreatePurshase" />
+                    <PurshaseForm
+                        @create="onCreatePurshase"
+                        :purshase="selectedPurshase"
+                        :stores="stores"
+                        :currencies="currencies"
+                    />
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -85,8 +90,10 @@
                 </v-card-title>
                 <v-card-text>
                     <PurshaseForm
-                        :purshase="selectedPurshase"
                         @update="onUpdatePurshase"
+                        :purshase="selectedPurshase"
+                        :stores="stores"
+                        :currencies="currencies"
                     />
                 </v-card-text>
                 <v-card-actions>
@@ -181,7 +188,7 @@
                                     color="primary"
                                     size="small"
                                     variant="outlined"
-                                    class="mr-2"
+                                    class="w-100"
                                     @click="
                                         selectedPurshase = purshase;
                                         showEditForm = true;
@@ -193,6 +200,7 @@
                                     color="error"
                                     size="small"
                                     variant="outlined"
+                                    class="w-100"
                                     @click="deletePurshase(purshase.id)"
                                 >
                                     Удалить
