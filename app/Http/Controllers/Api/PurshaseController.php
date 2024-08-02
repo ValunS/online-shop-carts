@@ -34,7 +34,7 @@ class PurshaseController extends Controller
         if ($searchTerm) {
             $query->where(function ($query) use ($searchTerm) {
                 $query->where('purshase_date', 'like', "%$searchTerm%")
-                    ->orWhere('sum', 'like', "%$searchTerm%")
+                // ->orWhere('sum', '=', (float) $searchTerm)
                     ->orWhere('currency', 'like', "%$searchTerm%")
                     ->orWhere('document_path', 'like', "%$searchTerm%")
                     ->orWhereHas('store', function ($query) use ($searchTerm) {
@@ -163,6 +163,7 @@ class PurshaseController extends Controller
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
             throw new \Exception('Недопустимый формат файла.');
         }
+        $originalName = $file->getClientOriginalName();
         $fileName = Str::random(40) . '.' . $file->getClientOriginalExtension();
         $filePath = 'documents/' . $fileName;
         Storage::disk('public')->put($filePath, file_get_contents($file));
