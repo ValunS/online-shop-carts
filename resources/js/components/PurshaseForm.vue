@@ -1,0 +1,205 @@
+<template>
+    <form @submit.prevent="handleSubmit">
+        <v-container>
+            <v-row>
+                <v-col cols="12" md="6">
+                    <v-select
+                        v-model.number="form.store_id"
+                        :items="stores"
+                        item-title="name"
+                        item-value="id"
+                        label="Магазин"
+                        required
+                        density="compact"
+                    ></v-select>
+                </v-col>
+                <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="form.purshase_date"
+                        label="Дата"
+                        type="datetime-local"
+                        required
+                        density="compact"
+                    ></v-text-field>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model.number="form.sum"
+                        label="Сумма"
+                        required
+                        density="compact"
+                    ></v-text-field>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                    <v-select
+                        v-model="form.currency"
+                        :items="currencies"
+                        label="Валюта"
+                        required
+                        density="compact"
+                    ></v-select>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                    <v-file-input
+                        label="Документ"
+                        @change="handleFileChange"
+                        density="compact"
+                    ></v-file-input>
+                </v-col>
+            </v-row>
+
+            <v-row justify="end">
+                <v-btn
+                    type="submit"
+                    color="primary"
+                    density="compact"
+                    :loading="loading"
+                    >{{ isEdit ? "Обновить" : "Создать" }}</v-btn
+                >
+                <v-btn
+                    color="error"
+                    density="compact"
+                    variant="outlined"
+                    class="ml-2"
+                    @click="$emit('close')"
+                >
+                    Отмена
+                </v-btn>
+            </v-row>
+        </v-container>
+    </form>
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+    props: {
+        purshase: {
+            type: Object,
+            default: null,
+        },
+        stores: {
+            type: Array,
+            default: null,
+        },
+        currencies: {
+            type: Array,
+            default: null,
+        },
+    },
+    data() {
+        return {
+            form: {
+                store_id: this.purshase?.store_id || "",
+                purshase_date: this.purshase?.purshase_date || "",
+                sum: this.purshase?.sum || "",
+                currency: this.purshase?.currency || "",
+                document: null,
+            },
+            loading: false,
+        };
+    },
+    computed: {
+        isEdit() {
+            return !!this.purshase;
+        },
+    },
+    mounted() {
+        if (!this.stores) {
+            this.fetchStores();
+        }
+        if (!this.currencies) {
+            this.fetchCurrencies();
+        }
+    },
+    methods: {
+        fetchStores() {
+            axios
+                .get("/api/stores")
+                .then((response) => {
+                    this.stores = response.data.data;
+                })
+                .catch((error) => {
+                    console.error(
+                        "Ошибка при получении списка магазинов:",
+                        error
+                    );
+                    // Обработка ошибки
+                });
+        },
+        fetchCurrencies() {
+            axios
+                .get("/api/currencies")
+                .then((response) => {
+                    this.currencies = response.data.data;
+                })
+                .catch((error) => {
+                    console.error("Ошибка при получении списка валют:", error);
+                });
+        },
+        handleFileChange(event) {
+            this.form.document = event.target.files[0];
+        },
+        handleSubmit() {
+            this.loading = true;
+
+            const formData = new FormData();
+            formData.append("store_id", this.form.store_id);
+            formData.append("purshase_date", this.form.purshase_date);
+            formData.append("sum", this.form.sum);
+            formData.append("currency", this.form.currency.toLowerCase());
+            if (this.form.document) {
+                formData.append("document", this.form.document);
+            }
+
+            if (this.isEdit) {
+                this.updatePurshase(formData);
+            } else {
+                this.createPurshase(formData);
+            }
+        },
+        createPurshase(formData) {
+            axios
+                .post("/api/purshase", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                })
+                .then((response) => {
+                    this.$emit("create", response.data.data);
+                    this.$emit("close"); // Закрываем диалог после создания
+                })
+                .catch((error) => {
+                    console.error("Ошибка при создании покупки:", error);
+                    // Обработка ошибки
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
+        },
+        updatePurshase(formData) {
+            axios
+                .put(`/api/purshase/${this.purshase.id}`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                })
+                .then((response) => {
+                    this.$emit("update", response.data.data);
+                    this.$emit("close"); // Закрываем диалог после обновления
+                })
+                .catch((error) => {
+                    console.error("Ошибка при обновлении покупки:", error);
+                    // Обработка ошибки
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
+        },
+    },
+};
+</script>
