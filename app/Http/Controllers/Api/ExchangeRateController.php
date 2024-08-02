@@ -3,87 +3,75 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreRequest;
-use App\Http\Resources\StoreResourse;
-use App\Models\Store;
+use App\Http\Requests\ExchangeRateRequest;
+use App\Http\Resources\ExchangeRateResourse;
+use App\Models\ExchangeRate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class StoreController extends Controller
+class ExchangeRateController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
+    public function index(Request $request)
     {
-        $store = Store::with("purshases")->get();
-        return StoreResourse::collection($store);
+        $exchangeRate = ExchangeRate::all();
+        return ExchangeRateResourse::collection($exchangeRate);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreRequest $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRequest $request)
+    public function store(ExchangeRateRequest $request)
     {
         try {
             DB::beginTransaction();
-            $store = Store::create($request->validated());
+            $rate = ExchangeRate::create($request->validated());
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();
             return response(['message' => $exception->getMessage()], 500);
         }
-
-        return (new StoreResourse($store))->response()->setStatusCode(201);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Store  $store
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Store $store)
-    {
-        return new StoreResourse($store);
+        return (new ExchangeRateResourse($rate))->response()->setStatusCode(201);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Store  $store
+     * @param ExchangeRateRequest $request
+     * @param  \App\Models\ExchangeRate  $exchangeRate
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreRequest $request, Store $store)
+    public function update(ExchangeRateRequest $request, ExchangeRate $exchangeRate)
     {
         try {
             DB::beginTransaction();
-            $store->update($request->validated());
+            $exchangeRate->update($request->validated());
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();
             return response(['message' => $exception->getMessage()], 500);
         }
-        return (new StoreResourse($store))->response()->setStatusCode(201);
+        return (new ExchangeRateResourse($exchangeRate))->response()->setStatusCode(201);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Store  $store
+     * @param  \App\Models\ExchangeRate  $exchangeRate
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Store $store)
+    public function destroy(ExchangeRate $exchangeRate)
     {
         try {
             DB::beginTransaction();
-            $store->delete();
+            $exchangeRate->delete();
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();

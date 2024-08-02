@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ExchangeRateResourse extends JsonResource
+class StoreResourse extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,9 +16,8 @@ class ExchangeRateResourse extends JsonResource
     {
         return [
             'id' => $this->id,
-            'usd' => $this->usd,
-            'eur' => $this->eur,
-            'rub' => $this->rub,
+            'name' => $this->name,
+            'purshases' => $this->whenLoaded('purshases'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

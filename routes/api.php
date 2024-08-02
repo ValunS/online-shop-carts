@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\CurrencyController;
+use App\Http\Controllers\Api\ExchangeRateController;
 use App\Http\Controllers\Api\PurshaseController;
 use App\Http\Controllers\Api\StoreController;
 use Illuminate\Http\Request;
@@ -11,3 +13,6 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('purshase', PurshaseController::class);
 Route::apiResource('stores', StoreController::class);
+Route::apiResource('exchange_rates', ExchangeRateController::class);
+
+Route::get('/currencies', [CurrencyController::class, 'index']);

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('purshases', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('store_id')->constrained('stores');
-            $table->dateTime('purchase_date');
-            $table->decimal('amount', 8, 2);
+            $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
+            $table->dateTime('purshase_date');
+            $table->decimal('sum', 8, 2);
             $table->string('currency');
             $table->string('document_path')->nullable();
             $table->timestamps();

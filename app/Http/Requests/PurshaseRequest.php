@@ -23,7 +23,7 @@ class PurshaseRequest extends FormRequest
     {
         return [
             'store_id' => 'required|integer|exists:stores,id',
-            'date' => 'required|date',
+            'purshase_date' => 'required|date',
             'sum' => 'required|numeric',
             'currency' => 'required|string|in:usd,eur,rub',
             'document' => 'nullable|file|mimes:pdf,jpg,jpeg|max:2048',
@@ -39,8 +39,8 @@ class PurshaseRequest extends FormRequest
             'store_id.integer' => 'id  магазина дожно быть числом',
             'store_id.exists' => 'Такого магазина не существует',
 
-            'date.required' => 'Необходимо ввести дату',
-            'date.date' => 'Некорректный формат даты',
+            'purshase_date.required' => 'Необходимо ввести дату',
+            'purshase_date.date' => 'Некорректный формат даты',
 
             'sum.required' => 'Необходимо ввести сумму',
             'sum.numeric' => 'Сумма должна быть числом',
