@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
         ExchangeRate::create(['currency' => 'eur', 'rate' => 100]);
         ExchangeRate::create(['currency' => 'rub', 'rate' => 1]);
 
-        Store::factory()->count(20)->create();
+        Store::factory()->count(3)->create();
 
-        Purshase::factory()->count(100)->create();
+        Purshase::factory()->count(10)->create();
     }
 }
