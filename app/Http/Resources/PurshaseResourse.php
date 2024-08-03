@@ -21,7 +21,7 @@ class PurshaseResourse extends JsonResource
             'purshase_date' => $this->purshase_date,
             'sum' => $this->sum,
             'currency' => $this->currency,
-            'document_path' => $this->document_path ? asset('storage/' . $this->document_path) : null,
+            'document_path' => $this->document_path ? asset($this->document_path) : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

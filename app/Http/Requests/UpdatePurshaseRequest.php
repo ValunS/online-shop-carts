@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PurshaseRequest extends FormRequest
+class UpdatePurshaseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,11 @@ class PurshaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => 'required|integer|exists:stores,id',
-            'purshase_date' => 'required|date',
-            'sum' => 'required|numeric',
-            'currency' => 'required|string|in:usd,eur,rub',
-            'document' => 'nullable|file|mimes:pdf,jpg|max:2048',
+            'store_id' => 'sometimes|integer|exists:stores,id', // 'sometimes' - поле не обязательно
+            'purshase_date' => 'sometimes|date',
+            'sum' => 'sometimes|numeric',
+            'currency' => 'sometimes|string|in:usd,eur,rub',
+            'document' => 'nullable|file|mimes:pdf,jpg,jpeg|max:2048',
         ];
     }
 
@@ -47,7 +47,7 @@ class PurshaseRequest extends FormRequest
             'currency.required' => 'Необходимо ввести валюту',
             'currency.in' => 'Валюта дожна быть usd,eur,rub',
 
-            'document.mimes' => 'Файл должен быть в формате pdf, jpg',
+            'document.mimes' => 'Файл должен быть в формате pdf, jpg или jpeg',
             'document.max' => 'Размер файла не должен превышать 2 МБ',
         ];
     }

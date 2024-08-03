@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurshaseRequest;
+use App\Http\Requests\UpdatePurshaseRequest;
 use App\Http\Resources\PurshaseResourse;
 use App\Models\Purshase;
 use App\Models\Store;
@@ -104,7 +105,7 @@ class PurshaseController extends Controller
      * @param  \App\Models\Purshase  $purshase
      * @return \Illuminate\Http\Response
      */
-    public function update(PurshaseRequest $request, Purshase $purshase)
+    public function update(UpdatePurshaseRequest $request, Purshase $purshase)
     {
         try {
             DB::beginTransaction();
@@ -163,11 +164,23 @@ class PurshaseController extends Controller
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
             throw new \Exception('Недопустимый формат файла.');
         }
-        $originalName = $file->getClientOriginalName();
-        $fileName = Str::random(40) . '.' . $file->getClientOriginalExtension();
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension = $file->getClientOriginalExtension();
+        $fileName = $this->generateUniqueFilename($originalName, $extension);
         $filePath = 'documents/' . $fileName;
         Storage::disk('public')->put($filePath, file_get_contents($file));
         // Storage::disk('s3')->put('documents/' . $fileName, file_get_contents($file)); // S3
         return $filePath;
+    }
+
+    private function generateUniqueFilename($originalName, $extension)
+    {
+        $fileName = Str::slug($originalName) . '.' . $extension;
+        $counter = 1;
+        while (Storage::disk('public')->exists('documents/' . $fileName)) {
+            $fileName = Str::slug($originalName) . '-' . $counter . '.' . $extension;
+            $counter++;
+        }
+        return $fileName;
     }
 }
