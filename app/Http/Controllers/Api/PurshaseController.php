@@ -120,7 +120,7 @@ class PurshaseController extends Controller
                 }
                 $file = $request->file('document');
                 $fileName = $this->uploadFile($file);
-                $data["document_path"] = $fileName;
+                $data["document_path"] = str_replace('storage', '', $fileName);
             }
 
             $purshase->update($data);
