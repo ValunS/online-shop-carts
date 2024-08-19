@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Storage;
 
+declare(strict_types=1);
 class DocumentController extends Controller
 {
     public function show($filename)

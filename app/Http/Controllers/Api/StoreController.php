@@ -1,93 +1,93 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRequest;
-use App\Http\Resources\StoreResourse;
+use App\Http\Resources\StoreResource;
 use App\Models\Store;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class StoreController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        $store = Store::with("purshases")->get();
-        return StoreResourse::collection($store);
+        /** @var Collection $store */
+        $store = [];
+        //Store::with("purshases")->get();
+        return StoreResource::collection($store);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param StoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request): JsonResponse
     {
-        try {
-            DB::beginTransaction();
-            $store = Store::create($request->validated());
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return response(['message' => $exception->getMessage()], 500);
-        }
+        $validated_store = $request->validated();
 
-        return (new StoreResourse($store))->response()->setStatusCode(201);
+        try {
+            $store = Store::create($validated_store);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 500);
+        }
+        return response()->json(new StoreResource($store), 201);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Store  $store
-     * @return \Illuminate\Http\Response
+     * @param  Store  $store
+     * @return StoreResource
      */
-    public function show(Store $store)
+    public function show(Store $store): StoreResource
     {
-        return new StoreResourse($store);
+        return new StoreResource($store->with("purshases"));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Store  $store
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @param  Store  $store
+     * @return JsonResponse
      */
-    public function update(StoreRequest $request, Store $store)
+    public function update(StoreRequest $request, Store $store): JsonResponse
     {
         try {
-            DB::beginTransaction();
-            $store->update($request->validated());
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return response(['message' => $exception->getMessage()], 500);
+            $validated_store = $request->validated();
+            $store = Store::create($validated_store);
+            return response()->json(new StoreResource($store), 201);
+        } catch (Exception $exception) {
+            return response()->json(['message' => 'Произошла ошибка при создании записи.', 'error' => $exception->getMessage()], 500);
         }
-        return (new StoreResourse($store))->response()->setStatusCode(201);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Store  $store
-     * @return \Illuminate\Http\Response
+     * @param  Store  $store
+     * @return JsonResponse
      */
-    public function destroy(Store $store)
+    public function destroy(Store $store): JsonResponse
     {
         try {
-            DB::beginTransaction();
             $store->delete();
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return response(['message' => $exception->getMessage()], 500);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 500);
         }
         return response()->json(null, 204);
     }
