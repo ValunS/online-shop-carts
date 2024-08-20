@@ -62,8 +62,7 @@ class UpdateExchangesRateCommand extends Command
      */
     private function updateExchangeRate(string $currency): void
     {
-        // Используем RUB как основную валюту
-        $response = Http::get("https://api.exchangerate-api.com/v4/latest/RUB"); // Пример API
+        $response = Http::get("https://api.exchangerate-api.com/v4/latest/$currency"); // Пример API
 
         if ($response->successful()) {
             $data = $response->json();
