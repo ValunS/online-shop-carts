@@ -222,7 +222,7 @@
 
 <script>
 import axios from "axios";
-import PurchaseForm from "./PurchaseForm.vue";
+import PurchaseForm from "./PurсhaseForm.vue";
 
 export default {
     components: {
