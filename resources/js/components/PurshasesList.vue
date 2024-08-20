@@ -8,7 +8,7 @@
                             v-model="searchTerm"
                             label="Поиск"
                             append-icon="mdi-magnify"
-                            @input="debounceFetchPurshases"
+                            @input="debounceFetchPurchases"
                             density="compact"
                         ></v-text-field>
                     </v-col>
@@ -41,7 +41,7 @@
                     <v-btn
                         color="primary"
                         class="mr-2"
-                        @click="fetchPurshases"
+                        @click="fetchPurchases"
                         density="compact"
                     >
                         Отфильтровать
@@ -63,9 +63,9 @@
                     <span class="text-h5">Создать покупку</span>
                 </v-card-title>
                 <v-card-text>
-                    <PurshaseForm
-                        @create="onCreatePurshase"
-                        :purshase="selectedPurshase"
+                    <PurchaseForm
+                        @create="onCreatePurchase"
+                        :purchase="selectedPurchase"
                         :stores="stores"
                         :currencies="currencies"
                     />
@@ -89,9 +89,9 @@
                     <span class="text-h5">Редактировать покупку</span>
                 </v-card-title>
                 <v-card-text>
-                    <PurshaseForm
-                        @update="onUpdatePurshase"
-                        :purshase="selectedPurshase"
+                    <PurchaseForm
+                        @update="onUpdatePurchase"
+                        :purchase="selectedPurchase"
                         :stores="stores"
                         :currencies="currencies"
                     />
@@ -131,12 +131,12 @@
                             </th>
                             <th
                                 class="text-left"
-                                :class="{ active: sortBy === 'purshase_date' }"
-                                @click="changeSort('purshase_date')"
+                                :class="{ active: sortBy === 'purchase_date' }"
+                                @click="changeSort('purchase_date')"
                             >
                                 Дата
                                 <v-icon
-                                    v-if="sortBy === 'purshase_date'"
+                                    v-if="sortBy === 'purchase_date'"
                                     small
                                     :icon="
                                         sortOrder === 'asc'
@@ -166,17 +166,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="purshase in purshases" :key="purshase.id">
-                            <td>{{ purshase.store_name }}</td>
-                            <td>{{ purshase.purshase_date }}</td>
-                            <td>{{ purshase.sum }} {{ purshase.currency }}</td>
+                        <tr v-for="purchase in purchases" :key="purchase.id">
+                            <td>{{ purchase.store_name }}</td>
+                            <td>{{ purchase.purchase_date }}</td>
+                            <td>{{ purchase.sum }} {{ purchase.currency }}</td>
                             <td>
                                 <a
-                                    :href="purshase.document_path"
+                                    :href="purchase.document_path"
                                     target="_blank"
                                     >{{
-                                        purshase.document_path
-                                            ? purshase.document_path
+                                        purchase.document_path
+                                            ? purchase.document_path
                                                   .split("/")
                                                   .pop()
                                             : ""
@@ -190,7 +190,7 @@
                                     variant="outlined"
                                     class="w-100"
                                     @click="
-                                        selectedPurshase = purshase;
+                                        selectedPurchase = purchase;
                                         showEditForm = true;
                                     "
                                 >
@@ -201,7 +201,7 @@
                                     size="small"
                                     variant="outlined"
                                     class="w-100"
-                                    @click="deletePurshase(purshase.id)"
+                                    @click="deletePurchase(purchase.id)"
                                 >
                                     Удалить
                                 </v-btn>
@@ -222,18 +222,18 @@
 
 <script>
 import axios from "axios";
-import PurshaseForm from "./PurshaseForm.vue";
+import PurchaseForm from "./PurchaseForm.vue";
 
 export default {
     components: {
-        PurshaseForm,
+        PurchaseForm,
     },
     data() {
         return {
-            purshases: [],
+            purchases: [],
             showCreateForm: false,
             showEditForm: false,
-            selectedPurshase: null,
+            selectedPurchase: null,
             searchTerm: "",
             stores: [],
             selectedStore: null,
@@ -247,7 +247,7 @@ export default {
         };
     },
     mounted() {
-        this.fetchPurshases();
+        this.fetchPurchases();
         this.fetchStores();
         this.fetchCurrencies();
 
@@ -284,9 +284,9 @@ export default {
                     console.error("Ошибка при получении списка валют:", error);
                 });
         },
-        fetchPurshases() {
+        fetchPurchases() {
             this.$router.push({
-                path: "/purshases",
+                path: "/purchases",
                 query: {
                     page: this.currentPage,
                     q: this.searchTerm,
@@ -298,7 +298,7 @@ export default {
             });
 
             axios
-                .get("/api/purshase", {
+                .get("/api/purchase", {
                     params: {
                         page: this.currentPage,
                         q: this.searchTerm,
@@ -309,7 +309,7 @@ export default {
                     },
                 })
                 .then((response) => {
-                    this.purshases = response.data.data;
+                    this.purchases = response.data.data;
                     this.totalPages = response.data.meta.last_page;
                 })
                 .catch((error) => {
@@ -319,35 +319,35 @@ export default {
                     );
                 });
         },
-        onCreatePurshase(newPurshase) {
-            this.purshases.push(newPurshase);
+        onCreatePurchase(newPurchase) {
+            this.purchases.push(newPurchase);
             this.showCreateForm = false;
         },
-        onUpdatePurshase(updatedPurshase) {
-            const index = this.purshases.findIndex(
-                (p) => p.id === updatedPurshase.id
+        onUpdatePurchase(updatedPurchase) {
+            const index = this.purchases.findIndex(
+                (p) => p.id === updatedPurchase.id
             );
             if (index !== -1) {
-                this.purshases.splice(index, 1, updatedPurshase);
+                this.purchases.splice(index, 1, updatedPurchase);
             }
             this.showEditForm = false;
         },
-        deletePurshase(id) {
+        deletePurchase(id) {
             if (confirm("Вы уверены, что хотите удалить эту покупку?")) {
                 axios
-                    .delete(`/api/purshase/${id}`)
+                    .delete(`/api/purchase/${id}`)
                     .then(() => {
-                        this.fetchPurshases();
+                        this.fetchPurchases();
                     })
                     .catch((error) => {
                         console.error("Ошибка при удалении покупки:", error);
                     });
             }
         },
-        debounceFetchPurshases() {
+        debounceFetchPurchases() {
             clearTimeout(this.debounceTimeout);
             this.debounceTimeout = setTimeout(() => {
-                this.fetchPurshases();
+                this.fetchPurchases();
             }, 300); // Задержка в миллисекундах
         },
         changeSort(field) {
@@ -358,10 +358,10 @@ export default {
                 this.sortOrder = "asc";
             }
             this.currentPage = 1; // Сбрасываем страницу на первую при смене сортировки
-            this.fetchPurshases();
+            this.fetchPurchases();
         },
         updatePagination() {
-            this.fetchPurshases();
+            this.fetchPurchases();
         },
     },
     computed: {

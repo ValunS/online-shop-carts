@@ -27,7 +27,7 @@ export default {
     name: "App",
     data: () => ({
         links: [
-            { name: "Purshases", path: "/purshases" }, // пример, подставьте ваши роуты
+            { name: "Purchases", path: "/purchases" }, // пример, подставьте ваши роуты
             // { name: 'Другой раздел', path: '/another' }, // и т.д.
         ],
     }),

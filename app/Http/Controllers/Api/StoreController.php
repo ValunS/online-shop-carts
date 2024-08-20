@@ -25,7 +25,7 @@ class StoreController extends Controller
     {
         /** @var Collection $store */
         $store = [];
-        //Store::with("purshases")->get();
+        //Store::with("purchases")->get();
         return StoreResource::collection($store);
     }
 
@@ -55,7 +55,7 @@ class StoreController extends Controller
      */
     public function show(Store $store): StoreResource
     {
-        return new StoreResource($store->with("purshases"));
+        return new StoreResource($store->with("purchases"));
     }
 
     /**

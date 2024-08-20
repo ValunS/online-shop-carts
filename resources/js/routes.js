@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 
-import PurshaseForm from "@/components/PurshaseForm.vue";
-import PurshasesList from "@/components/PurshasesList.vue";
+import PurchaseForm from "@/components/PurchaseForm.vue";
+import PurchasesList from "@/components/PurchasesList.vue";
 // import Login from "@/components/Auth/Login.vue";
 // import Register from "@/components/Auth/Register.vue";
 // import TaskList from "@/components/TaskList.vue";
@@ -13,14 +13,14 @@ import PurshasesList from "@/components/PurshasesList.vue";
 
 const routes = [
     {
-        path: "/purshases",
-        name: "PurshasesList",
-        component: PurshasesList,
+        path: "/purchases",
+        name: "PurchasesList",
+        component: PurchasesList,
     },
     {
-        path: "/purshases/{id}",
-        name: "PurshaseForm",
-        component: PurshaseForm,
+        path: "/purchases/{id}",
+        name: "PurchaseForm",
+        component: PurchaseForm,
     },
 ];
 

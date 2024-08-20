@@ -16,7 +16,7 @@
                 </v-col>
                 <v-col cols="12" md="6">
                     <v-text-field
-                        v-model="form.purshase_date"
+                        v-model="form.purchase_date"
                         label="Дата"
                         type="datetime-local"
                         required
@@ -80,7 +80,7 @@ import axios from "axios";
 
 export default {
     props: {
-        purshase: {
+        purchase: {
             type: Object,
             default: null,
         },
@@ -98,10 +98,10 @@ export default {
             localStores: this.stores ? [...this.stores] : [],
             localCurrencies: this.currencies ? [...this.currencies] : [],
             form: {
-                store_id: this.purshase?.store_id || "",
-                purshase_date: this.purshase?.purshase_date || "",
-                sum: this.purshase?.sum || "",
-                currency: this.purshase?.currency || "",
+                store_id: this.purchase?.store_id || "",
+                purchase_date: this.purchase?.purchase_date || "",
+                sum: this.purchase?.sum || "",
+                currency: this.purchase?.currency || "",
                 document: null,
             },
             loading: false,
@@ -109,7 +109,7 @@ export default {
     },
     computed: {
         isEdit() {
-            return !!this.purshase;
+            return !!this.purchase;
         },
     },
     mounted() {
@@ -152,7 +152,7 @@ export default {
 
             const formData = new FormData();
             formData.append("store_id", this.form.store_id);
-            formData.append("purshase_date", this.form.purshase_date);
+            formData.append("purchase_date", this.form.purchase_date);
             formData.append("sum", this.form.sum);
             formData.append("currency", this.form.currency.toLowerCase());
             if (this.form.document) {
@@ -160,14 +160,14 @@ export default {
             }
 
             if (this.isEdit) {
-                this.updatePurshase(formData);
+                this.updatePurchase(formData);
             } else {
-                this.createPurshase(formData);
+                this.createPurchase(formData);
             }
         },
-        createPurshase(formData) {
+        createPurchase(formData) {
             axios
-                .post("/api/purshase", formData, {
+                .post("/api/purchase", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -183,9 +183,9 @@ export default {
                     this.loading = false;
                 });
         },
-        updatePurshase(formData) {
+        updatePurchase(formData) {
             axios
-                .put(`/api/purshase/${this.purshase.id}`, formData, {
+                .put(`/api/purchase/${this.purchase.id}`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },

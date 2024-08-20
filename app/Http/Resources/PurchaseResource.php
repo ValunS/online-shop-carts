@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PurshaseResource extends JsonResource
+class PurchaseResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,7 +18,7 @@ class PurshaseResource extends JsonResource
             'id' => $this->id,
             'store_id' => $this->store_id,
             'store_name' => $this->store?->name,
-            'purshase_date' => $this->purshase_date,
+            'purchase_date' => $this->purchase_date,
             'sum' => $this->sum,
             'currency' => $this->currency,
             'document_path' => $this->document_path ? asset($this->document_path) : null,

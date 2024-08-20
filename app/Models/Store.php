@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Purshase> $purshases
- * @property-read int|null $purshases_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Purchase> $purchases
+ * @property-read int|null $purchases_count
  * @method static \Database\Factories\StoreFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Store newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Store newQuery()
@@ -32,8 +32,8 @@ class Store extends Model
         'name',
     ];
 
-    public function purshases()
+    public function purchases()
     {
-        return $this->hasMany(Purshase::class);
+        return $this->hasMany(Purchase::class);
     }
 }

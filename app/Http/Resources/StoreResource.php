@@ -17,7 +17,7 @@ class StoreResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'purshases' => $this->whenLoaded('purshases'),
+            'purchases' => $this->whenLoaded('purchases'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

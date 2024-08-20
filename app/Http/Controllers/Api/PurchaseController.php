@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PurshaseRequest;
-use App\Http\Requests\UpdatePurshaseRequest;
-use App\Http\Resources\PurshaseResource;
-use App\Models\Purshase;
+use App\Http\Requests\PurchaseRequest;
+use App\Http\Requests\UpdatePurchaseRequest;
+use App\Http\Resources\PurchaseResource;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -16,8 +16,9 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
-class PurshaseController extends Controller
+class PurchaseController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,11 +35,11 @@ class PurshaseController extends Controller
         $sortOrder = $request->input('sortOrder', 'asc');
 
         // Получаем все покупки, если не указан магазин
-        $query = Purshase::with('store');
+        $query = Purchase::with('store');
 
         if ($searchTerm) {
             $query->where(function ($query) use ($searchTerm) {
-                $query->where('purshase_date', 'like', "%$searchTerm%")
+                $query->where('purchase_date', 'like', "%$searchTerm%")
                     ->orWhere('currency', 'like', "%$searchTerm%")
                     ->orWhere('document_path', 'like', "%$searchTerm%")
                     ->orWhereHas('store', function ($query) use ($searchTerm) {
@@ -64,18 +65,18 @@ class PurshaseController extends Controller
             }
         }
 
-        $purshases = $query->paginate(20);
+        $purchases = $query->paginate(20);
 
-        return PurshaseResource::collection($purshases);
+        return PurchaseResource::collection($purchases);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  PurshaseRequest  $request
+     * @param  PurchaseRequest  $request
      * @return JsonResponse
      */
-    public function store(PurshaseRequest $request): JsonResponse
+    public function store(PurchaseRequest $request): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -87,22 +88,22 @@ class PurshaseController extends Controller
                 $data['document_path'] = $fileName;
             }
 
-            $purshase = Purshase::create($data);
+            $purchase = Purchase::create($data);
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
 
-        return (new PurshaseResource($purshase))->response()->setStatusCode(201);
+        return (new PurchaseResource($purchase))->response()->setStatusCode(201);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  Request  $request
-     * @param  Purshase  $purshase
+     * @param  Purchase  $purchase
      * @return JsonResponse
      */
-    public function update(UpdatePurshaseRequest $request, Purshase $purshase): JsonResponse
+    public function update(UpdatePurchaseRequest $request, Purchase $purchase): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -110,38 +111,40 @@ class PurshaseController extends Controller
             // Обработка загруженного файла
             if ($request->hasFile('document')) {
                 // Удаляем старый файл
-                if ($purshase->document_path) {
-                    Storage::disk('public')->delete($purshase->document_path);
-                    // Storage::disk('s3')->delete('documents/' . $purshase->document); // S3
+                if ($purchase->document_path) {
+                    Storage::disk('public')->delete($purchase->document_path);
+                    // Storage::disk('s3')->delete('documents/' . $purchase->document); // S3
                 }
                 $file = $request->file('document');
                 $fileName = $this->uploadFile($file);
                 $data["document_path"] = str_replace('storage', '', $fileName);
             }
 
-            $purshase->update($data);
+            $purchase->update($data);
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
-        return (new PurshaseResource($purshase))->response()->setStatusCode(201);
+        return (new PurchaseResource($purchase))->response()->setStatusCode(201);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Purshase  $purshase
+     * @param  Purchase  $purchase
      * @return JsonResponse
      */
-    public function destroy(Purshase $purshase): JsonResponse
+    public function destroy(Purchase $purchase): JsonResponse
     {
         try {
 
             // Удаляем файл покупки
-            if ($purshase->document_path) {
-                Storage::disk('public')->delete($purshase->document_path);
-                // Storage::disk('s3')->delete('documents/' . $purshase->document); // S3
+            if ($purchase->document_path) {
+                DB::transaction(function () use ($purchase) {
+                    $purchase->delete();
+                    Storage::disk('public')->delete($purchase->document_path);
+                    // Storage::disk('s3')->delete('documents/' . $purchase->document); // S3
+                }, 5);
             }
-            $purshase->delete();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }

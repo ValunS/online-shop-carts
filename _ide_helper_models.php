@@ -11,7 +11,7 @@
  */
 
 
-namespace App\Models{
+namespace App\Models {
 /**
  * 
  *
@@ -30,39 +30,43 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|ExchangeRate whereRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ExchangeRate whereUpdatedAt($value)
  */
-	class ExchangeRate extends \Eloquent {}
+	class ExchangeRate extends \Eloquent
+{
+}
 }
 
-namespace App\Models{
+namespace App\Models {
 /**
  * 
  *
  * @property int $id
  * @property int $store_id
- * @property string $purshase_date
+ * @property string $purchase_date
  * @property string $sum
  * @property string $currency
  * @property string|null $document_path
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Store $store
- * @method static \Database\Factories\PurshaseFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase query()
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase whereCurrency($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase whereDocumentPath($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase wherePurshaseDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase whereStoreId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase whereSum($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purshase whereUpdatedAt($value)
+ * @method static \Database\Factories\PurchaseFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereDocumentPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase wherePurchaseDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereStoreId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereSum($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereUpdatedAt($value)
  */
-	class Purshase extends \Eloquent {}
+	class Purchase extends \Eloquent
+{
+}
 }
 
-namespace App\Models{
+namespace App\Models {
 /**
  * 
  *
@@ -70,8 +74,8 @@ namespace App\Models{
  * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Purshase> $purshases
- * @property-read int|null $purshases_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Purchase> $purchases
+ * @property-read int|null $purchases_count
  * @method static \Database\Factories\StoreFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Store newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Store newQuery()
@@ -81,10 +85,12 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Store whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Store whereUpdatedAt($value)
  */
-	class Store extends \Eloquent {}
+	class Store extends \Eloquent
+{
+}
 }
 
-namespace App\Models{
+namespace App\Models {
 /**
  * 
  *
@@ -111,6 +117,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  */
-	class User extends \Eloquent {}
+	class User extends \Eloquent
+{
 }
-
+}
