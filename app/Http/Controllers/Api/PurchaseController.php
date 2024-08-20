@@ -79,16 +79,17 @@ class PurchaseController extends Controller
     public function store(PurchaseRequest $request): JsonResponse
     {
         try {
-            $data = $request->validated();
+            $validated_request = $request->validated();
 
             // Обработка загруженного файла
             if ($request->hasFile('document')) {
                 $file = $request->file('document');
-                $fileName = $this->uploadFile($file);
-                $data['document_path'] = $fileName;
+                $fileName = $this->generateUniqueFilename($file);
+                $validated_request['document_path'] = str_replace('storage', '', $fileName); //remove prefix 'storage'
             }
 
-            $purchase = Purchase::create($data);
+            $purchase = Purchase::create($validated_request);
+            $this->uploadFile($file, $fileName);
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
@@ -106,21 +107,26 @@ class PurchaseController extends Controller
     public function update(UpdatePurchaseRequest $request, Purchase $purchase): JsonResponse
     {
         try {
-            $data = $request->validated();
+            $validated_request = $request->validated();
 
             // Обработка загруженного файла
             if ($request->hasFile('document')) {
-                // Удаляем старый файл
-                if ($purchase->document_path) {
-                    Storage::disk('public')->delete($purchase->document_path);
-                    // Storage::disk('s3')->delete('documents/' . $purchase->document); // S3
-                }
                 $file = $request->file('document');
-                $fileName = $this->uploadFile($file);
-                $data["document_path"] = str_replace('storage', '', $fileName);
+                $fileName = $this->generateUniqueFilename($file);
+                $validated_request["document_path"] = str_replace('storage', '', $fileName); //remove prefix 'storage'
+
+                if ($purchase->document_path) { // Если уже был файл 
+                    DB::transaction(static function () use ($purchase, $validated_request) {
+                        $purchase->update($validated_request);
+                        Storage::disk('public')->delete($purchase->document_path); // Удаляем старый файл
+                        // Storage::disk('s3')->delete('documents/' . $purchase->document); // S3
+                    });
+                }
+            } else {
+                $purchase->update($validated_request);
             }
 
-            $purchase->update($data);
+
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
@@ -139,7 +145,7 @@ class PurchaseController extends Controller
 
             // Удаляем файл покупки
             if ($purchase->document_path) {
-                DB::transaction(function () use ($purchase) {
+                DB::transaction(static function () use ($purchase) {
                     $purchase->delete();
                     Storage::disk('public')->delete($purchase->document_path);
                     // Storage::disk('s3')->delete('documents/' . $purchase->document); // S3
@@ -157,15 +163,12 @@ class PurchaseController extends Controller
      * @param  UploadedFile  $file
      * @return string
      */
-    private function uploadFile(UploadedFile $file): string
+    private function uploadFile(UploadedFile $file, string $fileName): string
     {
         $allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/jpg'];
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
             throw new Exception('Недопустимый формат файла.');
         }
-        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $extension = $file->getClientOriginalExtension();
-        $fileName = $this->generateUniqueFilename($originalName, $extension);
         $filePath = 'documents/' . $fileName;
         Storage::disk('public')->put($filePath, $file);
         // Storage::disk('s3')->put('documents/' . $fileName, file_get_contents($file)); // S3
@@ -175,12 +178,13 @@ class PurchaseController extends Controller
     /**
      * Generate unique filename.
      *
-     * @param  string  $originalName
-     * @param  string  $extension
+     * @param  UploadedFile  $file
      * @return string
      */
-    private function generateUniqueFilename(string $originalName, string $extension): string
+    private function generateUniqueFilename(UploadedFile $file): string
     {
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension = $file->getClientOriginalExtension();
         $fileName = Str::slug($originalName) . '.' . $extension;
         $counter = 1;
         while (Storage::disk('public')->exists('documents/' . $fileName)) {

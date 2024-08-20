@@ -23,7 +23,7 @@ class ExchangeRateController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $exchangeRate = ExchangeRate::all();
+        $exchangeRate = ExchangeRate::pluck('currency');
         return ExchangeRateResource::collection($exchangeRate);
     }
 
@@ -35,8 +35,9 @@ class ExchangeRateController extends Controller
      */
     public function store(ExchangeRateRequest $request): JsonResponse
     {
+        $validated_request = $request->validated();
         try {
-            $exchangeRate = ExchangeRate::create($request->validated());
+            $exchangeRate = ExchangeRate::createOrFirst($validated_request['currency'], $validated_request);
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
@@ -53,7 +54,7 @@ class ExchangeRateController extends Controller
     public function update(ExchangeRateRequest $request, ExchangeRate $exchangeRate): JsonResponse
     {
         try {
-            $exchangeRate->update($request->validated());
+            $exchangeRate->updateOrCreate($request->validated());
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }

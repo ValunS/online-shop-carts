@@ -23,9 +23,7 @@ class StoreController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        /** @var Collection $store */
-        $store = [];
-        //Store::with("purchases")->get();
+        $store = Store::with("purchases")->get();
         return StoreResource::collection($store);
     }
 
