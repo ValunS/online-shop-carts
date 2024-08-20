@@ -21,7 +21,7 @@ class ExchangeRateController extends Controller
      *
      * @return AnonymousResourceCollection
      */
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $exchangeRate = ExchangeRate::all();
         return ExchangeRateResource::collection($exchangeRate);
@@ -33,14 +33,14 @@ class ExchangeRateController extends Controller
      * @param  Request  $request
      * @return JsonResponse
      */
-    public function store(ExchangeRateRequest $request)
+    public function store(ExchangeRateRequest $request): JsonResponse
     {
         try {
-            $rate = ExchangeRate::create($request->validated());
+            $exchangeRate = ExchangeRate::create($request->validated());
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
-        return (new ExchangeRateResource($rate))->response()->setStatusCode(201);
+        return response()->json(new ExchangeRateResource($exchangeRate), 201);
     }
 
     /**
@@ -50,14 +50,14 @@ class ExchangeRateController extends Controller
      * @param  ExchangeRate  $exchangeRate
      * @return JsonResponse
      */
-    public function update(ExchangeRateRequest $request, ExchangeRate $exchangeRate)
+    public function update(ExchangeRateRequest $request, ExchangeRate $exchangeRate): JsonResponse
     {
         try {
             $exchangeRate->update($request->validated());
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
-        return (new ExchangeRateResource($exchangeRate))->response()->setStatusCode(201);
+        return response()->json(new ExchangeRateResource($exchangeRate), 201);
     }
 
     /**
@@ -66,7 +66,7 @@ class ExchangeRateController extends Controller
      * @param  ExchangeRate  $exchangeRate
      * @return JsonResponse
      */
-    public function destroy(ExchangeRate $exchangeRate)
+    public function destroy(ExchangeRate $exchangeRate): JsonResponse
     {
         try {
             $exchangeRate->delete();

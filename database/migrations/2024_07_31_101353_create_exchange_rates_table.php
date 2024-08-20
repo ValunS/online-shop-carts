@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,8 +12,8 @@ return new class extends Migration
     {
         Schema::create('exchange_rates', function (Blueprint $table) {
             $table->id();
-            $table->string('currency');
-            $table->decimal('rate', 8, 4);
+            $table->string('currency')->unique();
+            $table->decimal('rate', 10, 4);
             $table->timestamps();
         });
     }

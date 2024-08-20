@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 
-declare(strict_types=1);
 class DocumentController extends Controller
 {
-    public function show($filename)
+    public function show($filename): Response
     {
         $path = 'documents/' . $filename; // Путь к файлу в хранилище
 

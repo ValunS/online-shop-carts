@@ -9,14 +9,13 @@ use App\Http\Requests\PurshaseRequest;
 use App\Http\Requests\UpdatePurshaseRequest;
 use App\Http\Resources\PurshaseResource;
 use App\Models\Purshase;
-use App\Models\Store;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\UploadedFile;
 
 class PurshaseController extends Controller
 {
@@ -26,7 +25,7 @@ class PurshaseController extends Controller
      * @param  Request  $request
      * @return AnonymousResourceCollection
      */
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $store_id = $request->input('store_id');
         $searchTerm = $request->input('q');
@@ -76,7 +75,7 @@ class PurshaseController extends Controller
      * @param  PurshaseRequest  $request
      * @return JsonResponse
      */
-    public function store(PurshaseRequest $request)
+    public function store(PurshaseRequest $request): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -103,7 +102,7 @@ class PurshaseController extends Controller
      * @param  Purshase  $purshase
      * @return JsonResponse
      */
-    public function update(UpdatePurshaseRequest $request, Purshase $purshase)
+    public function update(UpdatePurshaseRequest $request, Purshase $purshase): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -133,7 +132,7 @@ class PurshaseController extends Controller
      * @param  Purshase  $purshase
      * @return JsonResponse
      */
-    public function destroy(Purshase $purshase)
+    public function destroy(Purshase $purshase): JsonResponse
     {
         try {
 
@@ -149,7 +148,13 @@ class PurshaseController extends Controller
         return response()->json(null, 204);
     }
 
-    private function uploadFile($file)
+    /**
+     * Upload file to storage.
+     *
+     * @param  UploadedFile  $file
+     * @return string
+     */
+    private function uploadFile(UploadedFile $file): string
     {
         $allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/jpg'];
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
@@ -159,12 +164,19 @@ class PurshaseController extends Controller
         $extension = $file->getClientOriginalExtension();
         $fileName = $this->generateUniqueFilename($originalName, $extension);
         $filePath = 'documents/' . $fileName;
-        Storage::disk('public')->put($filePath, file_get_contents($file));
+        Storage::disk('public')->put($filePath, $file);
         // Storage::disk('s3')->put('documents/' . $fileName, file_get_contents($file)); // S3
         return $filePath;
     }
 
-    private function generateUniqueFilename($originalName, $extension)
+    /**
+     * Generate unique filename.
+     *
+     * @param  string  $originalName
+     * @param  string  $extension
+     * @return string
+     */
+    private function generateUniqueFilename(string $originalName, string $extension): string
     {
         $fileName = Str::slug($originalName) . '.' . $extension;
         $counter = 1;
